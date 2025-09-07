@@ -15,6 +15,11 @@
 #include <ChartObjects\ChartObjectsShapes.mqh>
 #include <Math\Stat\Stat.mqh>
 
+//--- Enums for Inputs
+enum ENUM_SENSITIVITY {SENSITIVITY_LOW, SENSITIVITY_MEDIUM, SENSITIVITY_HIGH};
+enum TPMethod { TPM_ATR, TPM_PERCENTAGE, TPM_PREDICTUM };
+enum LineStyle { LS_SOLID, LS_DASHED, LS_DOTTED };
+
 //+------------------------------------------------------------------+
 //| CVolumeProfile Class                                             |
 //+------------------------------------------------------------------+
@@ -363,7 +368,7 @@ void CEMATrend::Init(long chart_id, ENUM_APPLIED_PRICE ema_source, int ema_perio
     {
         if(ChartIndicatorAdd(m_chart_id, 0, m_ema_handle))
         {
-            IndicatorSetInteger(m_ema_handle, INDICATOR_PROP_COLOR, 0, m_ema_color);
+            IndicatorSetInteger(m_ema_handle, INDICATOR_PROP_COLOR, 0, (int)m_ema_color);
         }
     }
 }
@@ -375,6 +380,7 @@ void CEMATrend::Deinit()
 //+------------------------------------------------------------------+
 //| CEMAWave Class                                                   |
 //+------------------------------------------------------------------+
+#define BARS_TO_COLOR 200
 class CEMAWave
 {
 private:
@@ -387,7 +393,6 @@ private:
     int    m_pac_hi_handle;
     string m_bar_color_rect_prefix;
     long m_chart_id;
-    static const int BARS_TO_COLOR = 200;
 public:
     void CEMAWave();
     ~CEMAWave();
@@ -604,7 +609,7 @@ void CAISignals::Draw()
             if(m_sma_handles[i] == INVALID_HANDLE) continue;
             double sma_val[1]; CopyBuffer(m_sma_handles[i], 0, 0, 1, sma_val);
             color line_color = (close_val[0] >= sma_val[0]) ? C'26,179,213' : C'228,171,26';
-            IndicatorSetInteger(m_sma_handles[i], INDICATOR_PROP_COLOR, 0, line_color);
+            IndicatorSetInteger(m_sma_handles[i], INDICATOR_PROP_COLOR, 0, (int)line_color);
         }
     }
     MqlRates rates_sig[2]; CopyRates(_Symbol, _Period, 0, 2, rates_sig); ArraySetAsSeries(rates_sig, true);
@@ -919,7 +924,6 @@ input int    EMA_Wave_Length            = 34;         // EMA Wave Length
 input ENUM_APPLIED_PRICE EMA_Wave_Center_Source = PRICE_CLOSE; // Wave centre EMA source
 
 //==================== AI SIGNALS TOGGLES ================
-enum ENUM_SENSITIVITY {SENSITIVITY_LOW, SENSITIVITY_MEDIUM, SENSITIVITY_HIGH};
 input ENUM_SENSITIVITY Sensitivity = SENSITIVITY_LOW; // Sensitivity
 input bool   Opt_SupportResistance      = true;   // Support & Resistance
 input bool   Opt_Breaks                 = false;  // Breaks
@@ -929,7 +933,6 @@ input bool   Opt_ChannelBalance         = true;   // Channel Balance
 input bool   Opt_AutoTrendLines         = false;  // Auto Trend Lines
 
 //==================== MODULE - SIGNALS (TP/SL) ==========
-enum TPMethod { TPM_ATR, TPM_PERCENTAGE, TPM_PREDICTUM };
 input int       TP_NumberLevels         = 5;                 // Number of Take Profit Levels
 input TPMethod  TP_CalcMethod           = TPM_ATR;           // Calculation method for TP
 input bool      Levels_ShowLabels       = true;              // Show Entry Labels/SL/TP
@@ -940,7 +943,6 @@ input double    TP_Initial_Predictum    = 0.5;               // TP Initial Predi
 input double    SL_Percent              = 3.0;               // SL [%]
 input int       Price_Decimals          = 3;                 // Decimals
 
-enum LineStyle { LS_SOLID, LS_DASHED, LS_DOTTED };
 input bool      Show_TPSL_Lines         = true;              // Show TP/SL lines?
 input LineStyle TPSL_LineStyle          = LS_DOTTED;         // Line style
 input int       TPSL_Distance           = 3;                 // Distance
